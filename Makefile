@@ -21,8 +21,7 @@ install-deps:
 	@echo "📦 Installing dependencies..."
 	apt update
 	apt install -y python3 python3-pip nginx certbot python3-certbot-nginx docker.io
-	pip3 install --upgrade pip
-	pip3 install docker click
+	apt install -y python3-pip python3-click python3-docker
 	@echo "✅ Dependencies installed"
 
 install:
