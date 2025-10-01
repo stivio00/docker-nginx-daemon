@@ -14,6 +14,7 @@ This Python daemon automatically monitors Docker containers for a specific label
 
 - Python 3
 - Docker & Docker SDK for Python (pip install docker)
+- python-click
 - Nginx
 - Certbot & Certbot Nginx plugin (optional for HTTPS)
 - Root privileges for installing systemd service
@@ -79,6 +80,21 @@ services:
     environment:
       POSTGRES_PASSWORD: example
 
+```
+
+
+## Utils
+
+List all conatines with the label and status:
+
+```bash
+/usr/local/bin/docker_nginx_daemon.py list
+```
+
+Check dependencies and overall health:
+
+```bash
+/usr/local/bin/docker_nginx_daemon.py doctor
 ```
 
 ## Stopping the daemon

@@ -22,7 +22,7 @@ install-deps:
 	apt update
 	apt install -y python3 python3-pip nginx certbot python3-certbot-nginx docker.io
 	pip3 install --upgrade pip
-	pip3 install docker
+	pip3 install docker click
 	@echo "✅ Dependencies installed"
 
 install:

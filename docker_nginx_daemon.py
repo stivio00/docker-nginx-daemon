@@ -6,7 +6,6 @@ import signal
 import ssl
 import datetime
 import os
-import sys
 import click
 
 # -----------------------------
