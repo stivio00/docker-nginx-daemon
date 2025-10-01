@@ -2,7 +2,7 @@
 SERVICE_NAME = docker-nginx-daemon
 SCRIPT_SRC = $(shell pwd)/docker_nginx_daemon.py
 SCRIPT_DST = /usr/local/bin/docker_nginx_daemon.py
-UNIT_SRC = $(shell pwd)/docker_nginx_daemon.service
+UNIT_SRC = $(shell pwd)/docker-nginx-daemon.service
 UNIT_DST = /etc/systemd/system/$(SERVICE_NAME).service
 TEMPLATE_DIR = /etc/docker-nginx-daemon
 TEMPLATE_FILE = $(TEMPLATE_DIR)/site-template.conf
