@@ -220,19 +220,25 @@ def daemon():
     print("📡 Docker Nginx daemon started...")
     reconcile()
     global running
-    for event in client.events(decode=True):
-        if not running:
-            break
-        if event["Type"] != "container":
+    while running:
+        try:
+            for event in client.events(decode=True, timeout=1):
+                if not running:
+                    break
+                if event["Type"] != "container":
+                    continue
+                action = event["Action"]
+                attrs = event.get("Actor", {}).get("Attributes", {})
+                if LABEL_NAME not in attrs:
+                    continue
+                if action in ["start", "stop", "die", "destroy"]:
+                    print(f"⚡ Container {action} detected for host {attrs[LABEL_NAME]}")
+                    reconcile()
+        except docker.errors.APIError:
+            # Timeout, loop again
             continue
-        action = event["Action"]
-        attrs = event.get("Actor", {}).get("Attributes", {})
-        if LABEL_NAME not in attrs:
-            continue
-        if action in ["start", "stop", "die", "destroy"]:
-            print(f"⚡ Container {action} detected for host {attrs[LABEL_NAME]}")
-            reconcile()
-    print("👋 Exiting daemon")
+    print("👋 Daemon stopped.")
+
 
 
 @cli.command()
