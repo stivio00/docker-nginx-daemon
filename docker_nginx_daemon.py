@@ -10,6 +10,7 @@ import click
 import time
 import threading
 import sys
+from string import Template
 
 # -----------------------------
 # Configuration from environment
@@ -23,22 +24,22 @@ LABEL_NAME = "export-host"
 
 # Load Nginx template
 if Path(TEMPLATE_PATH).exists():
-    NGINX_TEMPLATE = Path(TEMPLATE_PATH).read_text()
+    NGINX_TEMPLATE = Template(Path(TEMPLATE_PATH).read_text())
 else:
-    NGINX_TEMPLATE = """
+    NGINX_TEMPLATE = Template("""
 server {
     listen 80;
-    server_name {server_name};
+    server_name $server_name;
 
     location / {
-        proxy_pass http://{container_ip}:{container_port};
+        proxy_pass http://$container_ip:$container_port;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
-"""
+""")
 
 # -----------------------------
 # Docker client
@@ -117,10 +118,10 @@ def conf_needs_update(host, expected_content):
 def generate_nginx_conf(exported_hosts):
     Path(NGINX_SITES_DIR).mkdir(parents=True, exist_ok=True)
     for entry in exported_hosts:
-        conf_content = NGINX_TEMPLATE.format(
+        conf_content = NGINX_TEMPLATE.substitute(
             server_name=entry["host"],
             container_ip=entry["ip"],
-            container_port=entry["port"] or "80",
+            container_port=entry["port"],
         )
         conf_path = Path(NGINX_SITES_DIR) / f"{entry['host']}.conf"
         if conf_needs_update(entry["host"], conf_content):

@@ -5,6 +5,7 @@ SCRIPT_DST = /usr/local/bin/docker_nginx_daemon.py
 UNIT_SRC = $(shell pwd)/docker-nginx-daemon.service
 UNIT_DST = /etc/systemd/system/$(SERVICE_NAME).service
 TEMPLATE_DIR = /etc/docker-nginx-daemon
+TEMPLATE_SRC = $(shell pwd)/site-template.conf
 TEMPLATE_FILE = $(TEMPLATE_DIR)/site-template.conf
 
 .PHONY: all install uninstall help install-deps 
@@ -21,7 +22,7 @@ install-deps:
 	@echo "📦 Installing dependencies..."
 	apt update
 	apt install -y python3 python3-pip nginx certbot python3-certbot-nginx docker.io
-	apt install -y python3-pip python3-click python3-docker
+	apt install -y python3-click python3-docker
 	@echo "✅ Dependencies installed"
 
 install:
@@ -35,20 +36,10 @@ install:
 	# Ensure template directory exists
 	mkdir -p $(TEMPLATE_DIR)
 
-	# Create default template if missing
+	# Copy default template if missing
 	if [ ! -f $(TEMPLATE_FILE) ]; then \
-		echo "server {" > $(TEMPLATE_FILE); \
-		echo "    listen 80;" >> $(TEMPLATE_FILE); \
-		echo "    server_name {server_name};" >> $(TEMPLATE_FILE); \
-		echo "    location / {" >> $(TEMPLATE_FILE); \
-		echo "        proxy_pass http://{container_ip}:{container_port};" >> $(TEMPLATE_FILE); \
-		echo "        proxy_set_header Host $$host;" >> $(TEMPLATE_FILE); \
-		echo "        proxy_set_header X-Real-IP $$remote_addr;" >> $(TEMPLATE_FILE); \
-		echo "        proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;" >> $(TEMPLATE_FILE); \
-		echo "        proxy_set_header X-Forwarded-Proto $$scheme;" >> $(TEMPLATE_FILE); \
-		echo "    }" >> $(TEMPLATE_FILE); \
-		echo "}" >> $(TEMPLATE_FILE); \
-		echo "✅ Created default Nginx template at $(TEMPLATE_FILE)"; \
+		cp $(TEMPLATE_SRC) $(TEMPLATE_FILE); \
+		@echo "✅ Copied default Nginx template to $(TEMPLATE_FILE)"; \
 	else \
 		echo "⏩ Nginx template already exists, skipping"; \
 	fi
