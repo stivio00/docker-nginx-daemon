@@ -171,15 +171,23 @@ def reconcile():
 
 
 def check_dependencies():
+    """Check if required dependencies are installed and usable."""
     deps = {
-        "docker": "docker --version",
-        "nginx": "nginx -v",
-        "certbot": "certbot --version",
-        "python3": "python3 --version",
+        "docker": ["docker", "--version"],
+        "nginx": ["systemctl", "is-active", "nginx"],
+        "certbot": ["certbot", "--version"],
+        "python3": ["python3", "--version"],
     }
+
     for name, cmd in deps.items():
-        result = subprocess.run(cmd.split(), capture_output=True)
-        status = "✅" if result.returncode == 0 else "❌"
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            if name == "nginx":
+                status = "✅ active" if result.stdout.strip() == "active" else "❌ inactive"
+            else:
+                status = "✅"
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            status = "❌"
         print(f"{name}: {status}")
 
 
