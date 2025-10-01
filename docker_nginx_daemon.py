@@ -7,6 +7,9 @@ import ssl
 import datetime
 import os
 import click
+import time
+import threading
+import sys
 
 # -----------------------------
 # Configuration from environment
@@ -48,6 +51,15 @@ def signal_handler(sig, frame):
     global running
     print("🛑 Stopping daemon...")
     running = False
+    # Force kill after 5 seconds if still running
+    def force_exit():
+        time.sleep(5)
+        if not running:
+            return  # already stopped
+        print("⚠️ Daemon did not stop, force exiting now!")
+        sys.exit(1)
+
+    threading.Thread(target=force_exit, daemon=True).start()
 
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -222,7 +234,7 @@ def daemon():
     global running
     while running:
         try:
-            for event in client.events(decode=True, timeout=1):
+            for event in client.events(decode=True):
                 if not running:
                     break
                 if event["Type"] != "container":
