@@ -1,0 +1,18 @@
+[Unit]
+Description=Docker to Nginx auto-config daemon
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/usr/local/bin/docker_nginx_daemon.py daemon
+Restart=always
+WorkingDirectory=/usr/local/bin
+User=root
+
+# Environment configuration (optional override)
+Environment="NGINX_SITES_DIR=/etc/nginx/sites-enabled"
+Environment="CERTBOT_CERT_DIR=/etc/letsencrypt/live"
+Environment="NGINX_TEMPLATE_PATH=/etc/docker-nginx-daemon/site-template.conf"
+
+[Install]
+WantedBy=multi-user.target
