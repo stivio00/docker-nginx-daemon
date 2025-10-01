@@ -61,5 +61,6 @@ uninstall:
 	systemctl disable $(SERVICE_NAME) || true
 	rm -f $(UNIT_DST)
 	rm -f $(SCRIPT_DST)
+	rm -rf $(TEMPLATE_DIR)
 	systemctl daemon-reload
 	@echo "✅ Service removed"
